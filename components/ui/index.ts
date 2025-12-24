@@ -1,3 +1,3 @@
-export { default as Button } from './Button';
-export { default as Input } from './Input';
-export { Card, CardHeader, CardContent, CardFooter } from './Card';
+export { Button } from './button';
+export { Input } from './input';
+export { Card, CardHeader, CardContent, CardFooter } from './card';

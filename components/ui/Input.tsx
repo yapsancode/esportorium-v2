@@ -1,64 +1,21 @@
-"use client";
+import * as React from "react"
 
-import React, { forwardRef, InputHTMLAttributes } from 'react';
+import { cn } from "@/lib/utils"
 
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
-    label?: string;
-    error?: string;
-    leftIcon?: React.ReactNode;
-    rightIcon?: React.ReactNode;
+function Input({ className, type, ...props }: React.ComponentProps<"input">) {
+  return (
+    <input
+      type={type}
+      data-slot="input"
+      className={cn(
+        "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+        "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
+        "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+        className
+      )}
+      {...props}
+    />
+  )
 }
 
-const Input = forwardRef<HTMLInputElement, InputProps>(
-    ({ className = '', label, error, leftIcon, rightIcon, id, ...props }, ref) => {
-        const inputId = id || label?.toLowerCase().replace(/\s+/g, '-');
-
-        return (
-            <div className="w-full">
-                {label && (
-                    <label
-                        htmlFor={inputId}
-                        className="block text-slate-700 text-sm font-semibold mb-2"
-                    >
-                        {label}
-                    </label>
-                )}
-                <div className="relative">
-                    {leftIcon && (
-                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400">
-                            {leftIcon}
-                        </div>
-                    )}
-                    <input
-                        ref={ref}
-                        id={inputId}
-                        className={`
-              w-full bg-slate-50 border rounded-xl px-4 py-3 text-slate-900 
-              focus:outline-none focus:ring-2 transition-all
-              ${leftIcon ? 'pl-10' : ''}
-              ${rightIcon ? 'pr-10' : ''}
-              ${error
-                                ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20'
-                                : 'border-slate-200 focus:border-brand-500 focus:ring-brand-500/20'
-                            }
-              ${className}
-            `}
-                        {...props}
-                    />
-                    {rightIcon && (
-                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400">
-                            {rightIcon}
-                        </div>
-                    )}
-                </div>
-                {error && (
-                    <p className="mt-1.5 text-sm text-red-500">{error}</p>
-                )}
-            </div>
-        );
-    }
-);
-
-Input.displayName = 'Input';
-
-export default Input;
+export { Input }
