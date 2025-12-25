@@ -13,9 +13,10 @@ import {
   FieldSeparator,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { PasswordInput } from "@/components/ui/password-input"
 import { AuthSlideshow } from "@/components/auth-slideshow"
 import { createBrowserClient } from "@/lib/supabase"
-import { Card, CardContent } from "./ui"
+import { Card, CardContent } from "@/components/ui/card"
 
 export function LoginForm({
   className,
@@ -90,9 +91,8 @@ export function LoginForm({
                     Forgot your password?
                   </Link>
                 </div>
-                <Input
+                <PasswordInput
                   id="password"
-                  type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}

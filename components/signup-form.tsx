@@ -14,6 +14,8 @@ import {
   FieldSeparator,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { PasswordInput } from "@/components/ui/password-input"
+import { PasswordStrengthInput, isPasswordStrong } from "@/components/ui/password-strength-input"
 import { AuthSlideshow } from "@/components/auth-slideshow"
 import { createBrowserClient } from "@/lib/supabase"
 
@@ -52,6 +54,12 @@ export function SignupForm({
 
     if (formData.password.length < 6) {
       setError("Password must be at least 6 characters")
+      setIsLoading(false)
+      return
+    }
+
+    if (!isPasswordStrong(formData.password)) {
+      setError("Password does not meet all requirements")
       setIsLoading(false)
       return
     }
@@ -154,35 +162,25 @@ export function SignupForm({
               </Field>
 
               <Field>
-                <Field className="grid grid-cols-2 gap-4">
-                  <Field>
-                    <FieldLabel htmlFor="password">Password</FieldLabel>
-                    <Input
-                      id="password"
-                      name="password"
-                      type="password"
-                      required
-                      value={formData.password}
-                      onChange={handleChange}
-                    />
-                  </Field>
-                  <Field>
-                    <FieldLabel htmlFor="confirm-password">
-                      Confirm Password
-                    </FieldLabel>
-                    <Input
-                      id="confirm-password"
-                      name="confirmPassword"
-                      type="password"
-                      required
-                      value={formData.confirmPassword}
-                      onChange={handleChange}
-                    />
-                  </Field>
-                </Field>
-                <FieldDescription>
-                  Must be at least 6 characters long.
-                </FieldDescription>
+                <FieldLabel htmlFor="password">Password</FieldLabel>
+                <PasswordStrengthInput
+                  id="password"
+                  name="password"
+                  required
+                  value={formData.password}
+                  onChange={handleChange}
+                />
+              </Field>
+
+              <Field>
+                <FieldLabel htmlFor="confirm-password">Confirm Password</FieldLabel>
+                <PasswordInput
+                  id="confirm-password"
+                  name="confirmPassword"
+                  required
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                />
               </Field>
               <Field>
                 <Button type="submit" disabled={isLoading} className="w-full">
