@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import Image from "next/image"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -53,6 +54,22 @@ export function LoginForm({
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
+      {/* Branding Header */}
+      <div className="absolute top-4 left-4 md:top-8 md:left-8 flex flex-col items-start z-20">
+        <div className="flex items-center gap-2">
+          <Image
+            src="/esportorium-logo.png"
+            alt="Esportorium Logo"
+            width={40}
+            height={40}
+          />
+          <h1 className="text-xl font-bold">Esportorium</h1>
+        </div>
+        <p className="text-muted-foreground text-sm pl-1">
+          Competitive esports. Simplified.
+        </p>
+      </div>
+
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
           <form className="p-6 md:p-8" onSubmit={handleSubmit}>
