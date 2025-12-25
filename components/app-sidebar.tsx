@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import {
   LayoutDashboard,
   Trophy,
@@ -43,7 +43,6 @@ const data = {
       title: "Dashboard",
       url: "/dashboard",
       icon: LayoutDashboard,
-      isActive: true,
     },
     {
       title: "Tournaments",
@@ -75,6 +74,12 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const router = useRouter()
+  const pathname = usePathname()
+
+  const navMainWithActive = data.navMain.map((item) => ({
+    ...item,
+    isActive: pathname === item.url || pathname?.startsWith(`${item.url}/`),
+  }))
 
   const handleLogout = async () => {
     const supabase = createBrowserClient()
@@ -89,7 +94,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={navMainWithActive} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} onLogout={handleLogout} />
