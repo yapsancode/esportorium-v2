@@ -48,6 +48,16 @@ const data = {
       title: "Tournaments",
       url: "/tournaments",
       icon: Trophy,
+      items: [
+        {
+          title: "All Tournaments",
+          url: "/tournaments",
+        },
+        {
+          title: "Create New",
+          url: "/tournaments/create",
+        },
+      ],
     },
     {
       title: "Participants",

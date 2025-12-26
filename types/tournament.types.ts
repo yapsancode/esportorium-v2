@@ -1,7 +1,9 @@
 export enum TournamentStatus {
   UPCOMING = 'Upcoming',
   ONGOING = 'Ongoing',
-  COMPLETED = 'Completed'
+  COMPLETED = 'Completed',
+  CANCELLED = 'Cancelled',
+  DRAFT = 'Draft',
 }
 
 export enum GameType {

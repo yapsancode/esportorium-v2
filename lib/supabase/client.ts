@@ -1,18 +1,17 @@
 import { createBrowserClient } from '@supabase/ssr';
 
-export function createClient() {
-    return createBrowserClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
-}
+export const createSupabaseBrowserClient = () =>
+  createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
 
-// Singleton pattern for browser client
-let client: ReturnType<typeof createBrowserClient> | null = null;
+// Optional: Singleton for convenience (most people use this)
+let browserClient: ReturnType<typeof createBrowserClient> | null = null;
 
-export function getSupabaseClient() {
-    if (!client) {
-        client = createClient();
-    }
-    return client;
-}
+export const supabaseBrowser = () => {
+  if (!browserClient) {
+    browserClient = createSupabaseBrowserClient();
+  }
+  return browserClient;
+};
