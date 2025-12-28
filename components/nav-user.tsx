@@ -1,5 +1,4 @@
 "use client"
-
 import {
   BadgeCheck,
   Bell,
@@ -7,8 +6,8 @@ import {
   CreditCard,
   LogOut,
   Sparkles,
+  User,
 } from "lucide-react"
-
 import {
   Avatar,
   AvatarFallback,
@@ -33,6 +32,7 @@ import {
 export function NavUser({
   user,
   onLogout,
+  onProfileClick,
 }: {
   user: {
     name: string
@@ -40,6 +40,7 @@ export function NavUser({
     avatar: string
   }
   onLogout?: () => void
+  onProfileClick?: () => void
 }) {
   const { isMobile } = useSidebar()
 
@@ -64,7 +65,7 @@ export function NavUser({
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+            className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
             side={isMobile ? "bottom" : "right"}
             align="end"
             sideOffset={4}
@@ -82,6 +83,10 @@ export function NavUser({
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={onProfileClick}>
+              <User />
+              Profile
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={onLogout}>
               <LogOut />
               Log out

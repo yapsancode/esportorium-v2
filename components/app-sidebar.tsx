@@ -1,5 +1,4 @@
 "use client"
-
 import * as React from "react"
 import { useRouter, usePathname } from "next/navigation"
 import {
@@ -11,7 +10,6 @@ import {
   User,
   LogOut,
 } from "lucide-react"
-
 import { NavMain } from "@/components/nav-main"
 import { NavUser } from "@/components/nav-user"
 import { TeamSwitcher } from "@/components/team-switcher"
@@ -57,27 +55,15 @@ const data = {
           title: "Create New",
           url: "/tournaments/create",
         },
+        {
+          title: "Participants",
+          url: "/tournaments/participants",
+        },
+        {
+          title: "Brackets",
+          url: "/tournaments/brackets",
+        },
       ],
-    },
-    {
-      title: "Participants",
-      url: "/participants",
-      icon: Users,
-    },
-    {
-      title: "Brackets",
-      url: "/brackets",
-      icon: GitGraph,
-    },
-    {
-      title: "Leaderboard",
-      url: "/leaderboard",
-      icon: Medal,
-    },
-    {
-      title: "Profile",
-      url: "/profile",
-      icon: User,
     },
   ],
 }
@@ -98,6 +84,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     router.refresh()
   }
 
+  const handleProfileClick = () => {
+    router.push("/profile")
+  }
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -107,7 +97,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={navMainWithActive} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} onLogout={handleLogout} />
+        <NavUser
+          user={data.user}
+          onLogout={handleLogout}
+          onProfileClick={handleProfileClick}
+        />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
