@@ -56,8 +56,8 @@ const data = {
           url: "/tournaments/create",
         },
         {
-          title: "Participants",
-          url: "/tournaments/participants",
+          title: "Teams & Participants",
+          url: "/tournaments/teams",
         },
         {
           title: "Brackets",

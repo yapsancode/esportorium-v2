@@ -54,15 +54,15 @@ export default function TournamentDetails({ tournament, onEdit, onDelete, onClos
           </div>
         </Button>
 
-        <Button variant="outline" className="w-full justify-start gap-2 h-auto py-3">
+        <Button variant="outline" className="w-full justify-start gap-2 h-auto py-3" onClick={() => window.location.href = `/tournaments/teams?id=${tournament.id}`}>
           <Users className="w-4 h-4 text-slate-500" />
           <div className="flex flex-col items-start">
-            <span className="text-sm font-semibold text-slate-900">Participants</span>
+            <span className="text-sm font-semibold text-slate-900">Teams</span>
             <span className="text-xs text-slate-500">View registered teams</span>
           </div>
         </Button>
 
-        <Button variant="outline" className="w-full justify-start gap-2 h-auto py-3">
+        <Button variant="outline" className="w-full justify-start gap-2 h-auto py-3" onClick={() => window.location.href = `/tournaments/brackets?id=${tournament.id}`}>
           <Trophy className="w-4 h-4 text-slate-500" />
           <div className="flex flex-col items-start">
             <span className="text-sm font-semibold text-slate-900">Bracket</span>
