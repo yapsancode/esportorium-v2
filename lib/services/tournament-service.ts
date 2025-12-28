@@ -1,0 +1,71 @@
+// ============================================================================
+// FILE: services/tournament-service.ts
+// ============================================================================
+import { supabaseBrowser } from '@/lib/supabase';
+import { Tournament } from '@/types';
+
+export const tournamentService = {
+  async fetchUserTournaments(userId: string) {
+    const supabase = supabaseBrowser();
+
+    // Query 1: Tournaments where user is creator
+    const { data: createdTournaments } = await supabase
+      .from('tournaments')
+      .select(`
+        id, name, max_teams, status, start_date, prize_pool,
+        teams(count), description, rules, format, registration_deadline, created_at
+      `)
+      .eq('creator_id', userId);
+
+    // Query 2: Tournaments where user is co-organizer
+    const { data: coOrganizedTournaments } = await supabase
+      .from('tournament_organizers')
+      .select(`
+        tournament:tournament_id (
+          id, name, max_teams, status, start_date, prize_pool,
+          teams(count), description, rules, format, registration_deadline, created_at
+        )
+      `)
+      .eq('user_id', userId);
+
+    // Combine and dedupe
+    const allTournaments = [
+      ...(createdTournaments || []),
+      ...(coOrganizedTournaments?.map((co: any) => co.tournament) || [])
+    ];
+
+    const uniqueMap = new Map();
+    allTournaments.forEach(t => {
+      if (t && t.id) uniqueMap.set(t.id, t);
+    });
+
+    return Array.from(uniqueMap.values());
+  },
+
+  async updateTournament(id: string, data: Partial<Tournament>) {
+    const supabase = supabaseBrowser();
+    
+    const { error } = await supabase
+      .from('tournaments')
+      .update({
+        name: data.name,
+        status: data.status,
+        max_teams: data.maxParticipants,
+        start_date: data.startDate,
+        prize_pool: data.prizePool?.replace('RM ', ''),
+        description: data.description,
+        rules: data.rules,
+        format: data.format,
+        registration_deadline: data.registrationDeadline
+      })
+      .eq('id', id);
+
+    return !error;
+  },
+
+  async deleteTournament(id: string) {
+    const supabase = supabaseBrowser();
+    const { error } = await supabase.from('tournaments').delete().eq('id', id);
+    return !error;
+  }
+};

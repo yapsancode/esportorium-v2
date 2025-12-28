@@ -1,9 +1,18 @@
+// export enum TournamentStatus {
+//   UPCOMING = 'Upcoming',
+//   ONGOING = 'Ongoing',
+//   COMPLETED = 'Completed',
+//   CANCELLED = 'Cancelled',
+//   DRAFT = 'Draft',
+// }
+
+// types/index.ts (or wherever your types are defined)
 export enum TournamentStatus {
-  UPCOMING = 'Upcoming',
-  ONGOING = 'Ongoing',
-  COMPLETED = 'Completed',
-  CANCELLED = 'Cancelled',
-  DRAFT = 'Draft',
+  DRAFT = 'draft',
+  PUBLISHED = 'published',
+  REGISTRATION_CLOSED = 'registration_closed',
+  ONGOING = 'ongoing',
+  COMPLETED = 'completed',
 }
 
 export enum GameType {
@@ -34,6 +43,8 @@ export interface Tournament {
   prizePool: string;
   description?: string;
   rules?: string;
+  format?: string;
+  registrationDeadline?: string;
 }
 
 export interface Match {

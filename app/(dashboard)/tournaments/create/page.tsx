@@ -11,15 +11,18 @@ import {
     Loader2,
     Calendar as CalendarIcon,
 } from "lucide-react";
+import { toast } from "sonner";
 
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogDescription,
-    DialogFooter,
-} from "@/components/ui/dialog";
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,6 +32,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import { MAX_TEAMS_OPTIONS, FORMAT_OPTIONS } from "@/constants/tournaments";
 
 export default function CreateTournamentPage() {
     const router = useRouter();
@@ -73,10 +77,17 @@ export default function CreateTournamentPage() {
 
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
-            alert("You must be logged in");
+            toast.error("Authentication Required", {
+                description: "You must be logged in to save a tournament draft."
+            });
             setIsSavingDraft(false);
             return;
         }
+
+        // Show loading toast
+        const loadingToast = toast.loading("Saving draft...", {
+            description: "Please wait while we save your tournament."
+        });
 
         const tournamentData = {
             creator_id: user.id,
@@ -90,18 +101,29 @@ export default function CreateTournamentPage() {
             registration_deadline: formData.registrationDeadline
                 ? format(formData.registrationDeadline, 'yyyy-MM-dd')
                 : null,
-            status: 'draft' as const,
+            status: 'draft' as const, // ✅ Matches DB constraint
         };
 
         const { error } = await supabase
             .from('tournaments')
             .insert(tournamentData);
 
+        // Dismiss loading toast
+        toast.dismiss(loadingToast);
+
         if (error) {
             console.error("Error saving draft:", error);
-            alert("Failed to save draft: " + error.message);
+            toast.error("Failed to Save Draft", {
+                description: error.message || "An unexpected error occurred. Please try again."
+            });
         } else {
-            router.push("/tournaments");
+            toast.success("Draft Saved Successfully!", {
+                description: `"${formData.name}" has been saved as a draft.`
+            });
+            // Small delay to show success message before navigation
+            setTimeout(() => {
+                router.push("/tournaments");
+            }, 500);
         }
 
         setIsSavingDraft(false);
@@ -113,10 +135,17 @@ export default function CreateTournamentPage() {
 
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
-            alert("You must be logged in");
+            toast.error("Authentication Required", {
+                description: "You must be logged in to launch a tournament."
+            });
             setIsLaunching(false);
             return;
         }
+
+        // Show loading toast
+        const loadingToast = toast.loading("Launching tournament...", {
+            description: "Making your tournament public and ready for registrations."
+        });
 
         const tournamentData = {
             creator_id: user.id,
@@ -130,18 +159,29 @@ export default function CreateTournamentPage() {
             registration_deadline: formData.registrationDeadline
                 ? format(formData.registrationDeadline, 'yyyy-MM-dd')
                 : null,
-            status: 'published' as const,
+            status: 'published' as const, // ✅ Matches DB constraint (was 'published')
         };
 
         const { error } = await supabase
             .from('tournaments')
             .insert(tournamentData);
 
+        // Dismiss loading toast
+        toast.dismiss(loadingToast);
+
         if (error) {
             console.error("Error launching tournament:", error);
-            alert("Failed to launch tournament: " + error.message);
+            toast.error("Failed to Launch Tournament", {
+                description: error.message || "An unexpected error occurred. Please try again."
+            });
         } else {
-            router.push("/tournaments");
+            toast.success("Tournament Launched!", {
+                description: `"${formData.name}" is now live and accepting registrations!`
+            });
+            // Small delay to show success message before navigation
+            setTimeout(() => {
+                router.push("/tournaments");
+            }, 800);
         }
 
         setIsLaunching(false);
@@ -157,21 +197,6 @@ export default function CreateTournamentPage() {
                     </h2>
                     <p className="text-slate-500">Build your MLBB event step by step.</p>
                 </div>
-
-                {/* Status Indicator */}
-                {/* <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-3">
-                        <div className="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 font-medium text-sm">
-                            <AlertCircle className="w-4 h-4 inline mr-1" />
-                            Draft
-                        </div>
-                        <span className="text-slate-400">→</span>
-                        <div className="px-4 py-2 rounded-lg bg-brand-100 text-brand-700 font-medium text-sm">
-                            <CheckCircle2 className="w-4 h-4 inline mr-1" />
-                            Published
-                        </div>
-                    </div>
-                </div> */}
             </div>
 
             {/* Main Form Card */}
@@ -278,11 +303,9 @@ export default function CreateTournamentPage() {
                                     <SelectValue placeholder="Select team slots" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="16">16 Teams</SelectItem>
-                                    <SelectItem value="32">32 Teams</SelectItem>
-                                    <SelectItem value="64">64 Teams</SelectItem>
-                                    <SelectItem value="128">128 Teams</SelectItem>
-                                    <SelectItem value="256">256 Teams</SelectItem>
+                                    {MAX_TEAMS_OPTIONS.map(({ value, label }) => (
+                                        <SelectItem key={value} value={String(value)}>{label}</SelectItem>
+                                    ))}
                                 </SelectContent>
                             </Select>
                         </div>
@@ -293,21 +316,18 @@ export default function CreateTournamentPage() {
                             </Label>
                             <Input
                                 id="prize"
-                                type="tel" // Use 'tel' for number-only keyboard; alternatively 'text' with pattern
+                                type="tel"
                                 inputMode="numeric"
                                 placeholder="e.g., 100,000"
                                 value={formData.prizePool}
                                 onChange={(e) => {
                                     const value = e.target.value;
-                                    // Allow only digits, remove any non-digit chars
-
                                     const rawValue = value.replace(/,/g, '').replace(/[^0-9]/g, '');
-                                    // ...leading zero check...
                                     const formatted = rawValue ? Number(rawValue).toLocaleString('en-US') : '';
                                     setFormData({ ...formData, prizePool: formatted });
                                 }}
                                 className="mt-2 bg-slate-50 border-slate-200"
-                                pattern="[0-9]*" // HTML5 validation
+                                pattern="[0-9]*"
                                 title="Please enter a valid whole number (e.g., 100000)"
                             />
                         </div>
@@ -326,11 +346,9 @@ export default function CreateTournamentPage() {
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="single-elimination">Single Elimination</SelectItem>
-                                <SelectItem value="double-elimination">Double Elimination</SelectItem>
-                                <SelectItem value="round-robin">Round Robin</SelectItem>
-                                <SelectItem value="swiss">Swiss System</SelectItem>
-                                <SelectItem value="groups-playoffs">Group Stage + Playoffs</SelectItem>
+                                {FORMAT_OPTIONS.map(({ value, label }) => (
+                                    <SelectItem key={value} value={value}>{label}</SelectItem>
+                                ))}
                             </SelectContent>
                         </Select>
                     </div>
@@ -401,36 +419,34 @@ export default function CreateTournamentPage() {
             </div>
 
             {/* Custom Launch Confirmation Dialog */}
-            <Dialog open={showLaunchDialog} onOpenChange={setShowLaunchDialog}>
-                <DialogContent className="max-w-md rounded-2xl border-slate-200 shadow-2xl">
-                    <DialogHeader className="text-center pt-6">
-                        <div className="mx-auto w-20 h-20 bg-brand-100 rounded-full flex items-center justify-center mb-4">
-                            <Trophy className="w-12 h-12 text-brand-600" />
-                        </div>
-                        <DialogTitle className="text-2xl font-bold text-slate-900">
+            <AlertDialog open={showLaunchDialog} onOpenChange={setShowLaunchDialog}>
+                <AlertDialogContent className="max-w-md rounded-2xl border-slate-200 shadow-2xl">
+                    <AlertDialogHeader className="flex flex-col items-center text-center pt-6">
+                        <AlertDialogTitle className="text-2xl font-bold text-slate-900">
                             Launch Tournament?
-                        </DialogTitle>
-                        <DialogDescription className="text-slate-600 mt-3 text-base">
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="text-slate-600 mt-3 text-base text-center">
                             <strong>{formData.name || "This tournament"}</strong> will become publicly visible.
                             <br />
                             Teams can start registering immediately.
                             <br />
                             <span className="text-brand-600 font-medium">This action cannot be undone.</span>
-                        </DialogDescription>
-                    </DialogHeader>
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
 
-                    <DialogFooter className="flex gap-3 mt-8">
-                        <Button
-                            variant="outline"
-                            onClick={() => setShowLaunchDialog(false)}
-                            className="flex-1"
+                    <AlertDialogFooter className="flex gap-3 mt-8 w-full sm:flex-row sm:justify-center sm:space-x-0">
+                        <AlertDialogCancel
+                            className="flex-1 mt-0"
                             disabled={isLaunching}
                         >
                             Cancel
-                        </Button>
-                        <Button
-                            onClick={handleLaunch}
-                            className="flex-1 bg-brand-600 hover:bg-brand-700 shadow-lg"
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={(e) => {
+                                e.preventDefault();
+                                handleLaunch();
+                            }}
+                            className="flex-1 bg-brand-600 hover:bg-brand-700 shadow-lg text-white"
                             disabled={isLaunching}
                         >
                             {isLaunching ? (
@@ -439,15 +455,12 @@ export default function CreateTournamentPage() {
                                     Launching...
                                 </>
                             ) : (
-                                <>
-                                    <Trophy className="w-4 h-4 mr-2" />
-                                    Yes, Launch It!
-                                </>
+                                "Yes, Launch It!"
                             )}
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }
