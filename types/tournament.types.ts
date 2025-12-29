@@ -23,12 +23,22 @@ export enum GameType {
   SPORTS = 'Sports'
 }
 
-export interface Participant {
+export interface Player {
   id: string;
   name: string;
-  avatar: string;
+  ign?: string; // In-Game Name
+  role?: string;
+  avatar?: string;
+  teamId?: string;
+}
+
+export interface Team {
+  id: string;
+  name: string;
+  avatar: string; // Team Logo
   rank?: string;
   winRate?: number;
+  players?: Player[];
 }
 
 export interface Tournament {
@@ -36,8 +46,8 @@ export interface Tournament {
   name: string;
   game: string;
   type: GameType;
-  participants: number;
-  maxParticipants: number;
+  participants: number; // Current teams count
+  maxParticipants: number; // Max teams
   status: TournamentStatus;
   startDate: string;
   prizePool: string;
@@ -50,8 +60,8 @@ export interface Tournament {
 export interface Match {
   id: string;
   round: number;
-  player1: Participant | null;
-  player2: Participant | null;
+  player1: Team | null;
+  player2: Team | null;
   score1: number;
   score2: number;
   winnerId?: string;
@@ -60,7 +70,7 @@ export interface Match {
 
 export interface LeaderboardEntry {
   rank: number;
-  player: Participant;
+  player: Team;
   points: number;
   tournamentsPlayed: number;
   wins: number;
